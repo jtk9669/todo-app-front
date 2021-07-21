@@ -1,151 +1,67 @@
+import axios from 'axios';
+import {
+  TodoListQuery,
+  TodoFindByIdQuery,
+  TodoDeleteQuery,
+  TodoUpdateQuery,
+} from './queries';
 import { TodoItemType } from './types';
 
-export const GRAPHQL_API_SERVER_URL = 'http://localhost:4000/graphql';
-
-export const TodoCreateQuery = (item: TodoItemType) => {
-  return {
-    query: `
-        mutation ($params : TodoCreateInput!) {
-          TodoCreate (
-            params : $params
-          ) {
-            ok
-            error{
-              location
-              severity
-              code
-              message
-            }
-            data{
-              _id
-              title
-              content
-            }
-          }
-        }
-        `,
-    variables: {
-      params: {
-        title: item.title,
-        content: item.content,
+export default {
+  async todoList(page: number = 1, cntPerPage: number = 4) {
+    const { query, variables } = TodoListQuery(page, cntPerPage);
+    const {
+      data: {
+        data: { TodoList },
       },
-    },
-  };
-};
+    } = await axios.post('http://localhost:4000/graphql', {
+      query,
+      variables,
+    });
 
-export const TodoUpdateQuery = (item: TodoItemType) => {
-  return {
-    query: `
-        mutation ($id : String!, $params : TodoUpdateInput!) {
-          TodoUpdate (
-            id : $id,
-            params : $params
-          ) {
-            ok
-            error{
-              location
-              severity
-              code
-              message
-            }
-            data{
-              _id
-              title
-              content
-            }
-          }
-        }
-        `,
-    variables: {
-      id: String(item._id),
-      params: {
-        title: item.title,
-        content: item.content,
+    return TodoList;
+    // console.log(totalPageSize);
+    // this.todos = data;
+    // // sync spoed slot
+    // this.$emit('update:total-page-size', totalPageSize);
+    // //  this.totalPageSize = totalPageSize;
+  },
+  async todoView(item: TodoItemType) {
+    const { query, variables } = TodoFindByIdQuery(item);
+    const {
+      data: {
+        data: {
+          TodoFindById, // : { data: todo }
+        },
       },
-    },
-  };
-};
+    } = await axios.post('http://localhost:4000/graphql', { query, variables });
+    return TodoFindById; // { data: todo }
+    // // sync spoed slot
+    // this.targetTodo = todo;
 
-export const TodoFindByIdQuery = (item: TodoItemType) => {
-  return {
-    query: `query ($id : String!){
-      TodoFindById(
-        id : $id,
-      )
-      {
-        ok
-        error{
-          location
-          severity
-          code
-          message
-        }
-        data{
-          _id
-          title
-          content
-        }
-      }
-  }
-  `,
-    variables: { id: String(item._id) },
-  };
-};
+    // // 다이얼로그 함수 호출
+    // this.$emit('show-view-dialog');
+    // // this.showViewDialog();
+  },
+  async todoRemove(item: TodoItemType) {
+    const { query, variables } = TodoDeleteQuery(item);
+    const {
+      data: {
+        data: {
+          TodoDelete, // : { data }
+        },
+      },
+    } = await axios.post('http://localhost:4000/graphql', { query, variables });
+    return TodoDelete;
+    // this.todoList(this.page);
+  },
+  async todoUpdate(todo: TodoItemType) {
+    const { query, variables } = TodoUpdateQuery(todo);
+    await axios.post('http://localhost:4000/graphql', { query, variables });
 
-export const TodoListQuery = (page: number, cntPerPage: number) => {
-  return {
-    query: `query ($pageInput : pageInput!){
-          TodoList(
-            pageInput : $pageInput
-          )
-          {
-              ok
-              error{
-                location
-                severity
-                code
-                message
-              }
-              page{
-                page
-                totalPageSize
-              }
-              data{
-                _id
-                title
-                content
-                createdAt
-                updatedAt
-              }
-          }
-      }
-      `,
-    variables: { pageInput: { page, cntPerPage } },
-  };
-};
-
-export const TodoDeleteQuery = (item: TodoItemType) => {
-  return {
-    query: `
-            mutation ($id : String!) {
-              TodoDelete (
-                id : $id,
-              ) {
-                ok
-                error{
-                  location
-                  severity
-                  code
-                  message
-                }
-                data{
-                  _id
-                  title
-                  content
-                }
-              }
-            }
-        `,
-    variables: { id: String(item._id) },
-  };
+    //     // 다이얼로그 함수 호출
+    // // this.cancel();
+    // this.$emit('cancel');
+    // this.todoList(this.page);
+  },
 };
