@@ -21,12 +21,12 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- <slot
-      name="todo-dialog"
-      :todo-target="todoTarget"
+    <slot
+      name="dialog"
       :is-show-dialog="isShowDialog"
-      :type="type"
-    ></slot> -->
+      type="type"
+      :target-todo="targetTodo"
+    ></slot>
   </div>
 </template>
 
@@ -41,25 +41,27 @@ export default Vue.extend({
       required: true,
     } as PropOptions<TodoItemType[]>,
   },
-
+  data() {
+    return {
+      isShowDialog: false,
+      type: '조회',
+      targetTodo: {
+        _id: '',
+        title: '',
+        content: '',
+      } as TodoItemType,
+    };
+  },
   methods: {
     view(todo: TodoItemType) {
-      console.log('view : ' + todo);
-      console.log(todo);
-      const obj = {
-        targetTodo: todo,
-        type: '조회',
-        isShowDialog: true,
-      };
-      this.$emit('show-dialog', obj);
+      this.targetTodo = todo;
+      this.type = '조회';
+      this.isShowDialog = true;
     },
     update(todo: TodoItemType) {
-      const obj = {
-        targetTodo: todo,
-        type: '수정',
-        isShowDialog: true,
-      };
-      this.$emit('show-dialog', obj);
+      this.targetTodo = todo;
+      this.type = '수정';
+      this.isShowDialog = true;
     },
     remove(todo: TodoItemType) {
       this.$emit('remove-todo', todo);

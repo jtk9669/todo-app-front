@@ -4,26 +4,30 @@
       :page="page"
       :total-page-size.sync="totalPageSize"
       :cnt-per-page="cntPerPage"
-      :todo-target="todoTarget"
     >
-      <template #[`todo-presenter`]="scopedSlot">
+      <template #[`todo-presenter`]="parentSlot">
         <todo-presenter
-          :todos="scopedSlot.todos"
-          @show-dialog="showDialog"
-          @remove-todo="scopedSlot.removeTodo"
-        />
-        <dialog-presenter
-          :is-show-dialog.sync="isShowDialog"
-          :type="type"
-          @update-todo="scopedSlot.updateTodo(todoTarget)"
-          @add-todo="scopedSlot.addTodo(todoTarget)"
+          :todos="parentSlot.todos"
+          @remove-todo="parentSlot.removeTodo"
         >
-          <template #[`field`]>
-            <v-text-field v-model="todoTarget._id" label="id" />
-            <v-text-field v-model="todoTarget.title" label="title" />
-            <v-text-field v-model="todoTarget.content" label="content" />
+          <template #[`dialog`]="child">
+            <dialog-presenter
+              :is-show-dialog.sync="child.isShowDialog"
+              :type="child.type"
+              @update-todo="parentSlot.updateTodo"
+              @add-todo="parentSlot.addTodo"
+            >
+              <template #[`field`]>
+                <!-- <v-text-field v-model="child.todoTarget._id" label="id" />
+                <v-text-field v-model="child.todoTarget.title" label="title" />
+                <v-text-field
+                  v-model="child.todoTarget.content"
+                  label="content"
+                /> -->
+              </template>
+            </dialog-presenter>
           </template>
-        </dialog-presenter>
+        </todo-presenter>
       </template>
     </todo-container>
     <v-pagination v-model="page" :length="totalPageSize" />
@@ -35,7 +39,7 @@ import Vue from 'vue';
 import TodoContainer from '@/components/Todo/TodoContainer.vue';
 import TodoPresenter from '@/components/Todo/TodoPresenter.vue';
 import DialogPresenter from '../Dialog/DialogPresenter.vue';
-import { TodoItemType } from '~/api/todo/types';
+// import { TodoItemType } from '~/api/todo/types';
 
 export default Vue.extend({
   components: {
@@ -48,23 +52,8 @@ export default Vue.extend({
       page: 1,
       cntPerPage: 3,
       totalPageSize: 1,
-      isShowDialog: false,
-      type: '조회',
-      disabled: false,
-      todoTarget: {
-        _id: '',
-        title: '',
-        content: '',
-      } as TodoItemType,
     };
   },
-  methods: {
-    showDialog(obj: any) {
-      // 다이얼로그 ON
-      this.todoTarget = obj.targetTodo;
-      this.isShowDialog = obj.isShowDialog;
-      this.type = obj.type;
-    },
-  },
+  methods: {},
 });
 </script>
