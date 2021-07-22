@@ -11,6 +11,8 @@
           @remove-todo="parentSlot.removeTodo"
         >
           <template #[`dialog`]="child">
+            {{ child }}
+
             <dialog-presenter
               :is-show-dialog.sync="child.isShowDialog"
               :type="child.type"
@@ -18,12 +20,12 @@
               @add-todo="parentSlot.addTodo"
             >
               <template #[`field`]>
-                <!-- <v-text-field v-model="child.todoTarget._id" label="id" />
-                <v-text-field v-model="child.todoTarget.title" label="title" />
+                <v-text-field v-model="child.targetTodo._id" label="id" />
+                <v-text-field v-model="child.targetTodo.title" label="title" />
                 <v-text-field
-                  v-model="child.todoTarget.content"
+                  v-model="child.targetTodo.content"
                   label="content"
-                /> -->
+                />
               </template>
             </dialog-presenter>
           </template>

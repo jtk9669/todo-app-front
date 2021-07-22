@@ -1,12 +1,8 @@
 <template>
   <div>
-    <v-dialog
-      :value="localShowDialog"
-      @input="localShowDialog = !localShowDialog"
-      max-width="600px"
-    >
+    <v-dialog :value="localShowDialog" @input="localShowDialog = false">
       <v-card>
-        <v-card-title>{{ type }}</v-card-title>
+        <v-card-title>{{ type }} {{ localShowDialog }}</v-card-title>
         <v-card-text>
           <slot name="field"></slot>
         </v-card-text>
@@ -45,7 +41,8 @@ export default Vue.extend({
 
   methods: {
     cancel() {
-      this.localShowDialog = false;
+      // this.localShowDialog = false;
+      this.$emit('update:is-show-dialog');
     },
     save() {
       this.$emit('update-todo');

@@ -21,10 +21,11 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-btn @click="add">추가</v-btn>
     <slot
       name="dialog"
       :is-show-dialog="isShowDialog"
-      type="type"
+      :type="type"
       :target-todo="targetTodo"
     ></slot>
   </div>
@@ -65,6 +66,15 @@ export default Vue.extend({
     },
     remove(todo: TodoItemType) {
       this.$emit('remove-todo', todo);
+    },
+    add() {
+      this.targetTodo = {
+        _id: '',
+        title: '',
+        content: '',
+      };
+      this.type = '추가';
+      this.isShowDialog = true;
     },
   },
 });
