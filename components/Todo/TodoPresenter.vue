@@ -1,25 +1,33 @@
 <template>
-  <v-row cols="12" class="justify-start">
-    <v-col v-for="todo in todos" :key="todo._id" cols="6">
-      <v-card>
-        <v-card-title>{{ todo.title }}</v-card-title>
-        <v-card-text>
-          {{ todo.content }}
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn small @click="view(todo)">
-            <v-icon>mdi-eye-outline</v-icon>
-          </v-btn>
-          <v-btn small @click="update(todo)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn small @click="remove(todo)">
-            <v-icon>mdi-trash-can-outline</v-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div>
+    <v-row cols="12" class="justify-start">
+      <v-col v-for="todo in todos" :key="todo._id" cols="6">
+        <v-card>
+          <v-card-title>{{ todo.title }}</v-card-title>
+          <v-card-text>
+            {{ todo.content }}
+          </v-card-text>
+          <v-card-actions class="d-flex justify-end">
+            <v-btn small @click="view(todo)">
+              <v-icon>mdi-eye-outline</v-icon>
+            </v-btn>
+            <v-btn small @click="update(todo)">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn small @click="remove(todo)">
+              <v-icon>mdi-trash-can-outline</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- <slot
+      name="todo-dialog"
+      :todo-target="todoTarget"
+      :is-show-dialog="isShowDialog"
+      :type="type"
+    ></slot> -->
+  </div>
 </template>
 
 <script lang="ts">
@@ -33,15 +41,28 @@ export default Vue.extend({
       required: true,
     } as PropOptions<TodoItemType[]>,
   },
+
   methods: {
     view(todo: TodoItemType) {
-      this.$emit('todo-view', todo);
+      console.log('view : ' + todo);
+      console.log(todo);
+      const obj = {
+        targetTodo: todo,
+        type: '조회',
+        isShowDialog: true,
+      };
+      this.$emit('show-dialog', obj);
     },
     update(todo: TodoItemType) {
-      this.$emit('todo-update', todo);
+      const obj = {
+        targetTodo: todo,
+        type: '수정',
+        isShowDialog: true,
+      };
+      this.$emit('show-dialog', obj);
     },
     remove(todo: TodoItemType) {
-      this.$emit('todo-remove', todo);
+      this.$emit('remove-todo', todo);
     },
   },
 });

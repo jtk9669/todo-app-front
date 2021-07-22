@@ -114,8 +114,7 @@ export const TodoListQuery = (page: number, cntPerPage: number) => {
                 _id
                 title
                 content
-                createdAt
-                updatedAt
+
               }
           }
       }

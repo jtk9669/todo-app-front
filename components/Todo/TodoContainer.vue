@@ -1,17 +1,19 @@
 <template>
   <div>
-    <slot :todos="todos" :target-todo="targetTodo"></slot>
+    <slot
+      name="todo-presenter"
+      :todos="todos"
+      :remove-todo="removeTodo"
+      :update-todo="updateTodo"
+      :add-todo="addTodo"
+    ></slot>
+    <slot name="todo-presenter-dialog"></slot>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import {
-  TodoDeleteQuery,
-  TodoFindByIdQuery,
-  TodoListQuery,
-  TodoUpdateQuery,
-} from '~/api/todo/api';
+
 import { TodoItemType } from '~/api/todo/types';
 export default Vue.extend({
   props: {
@@ -34,85 +36,38 @@ export default Vue.extend({
   data() {
     return {
       todos: [] as TodoItemType[],
-      targetTodo: {
-        _id: '',
-        title: '',
-        content: '',
-      } as TodoItemType,
     };
   },
-  methods: {
-    todoList(page: number) {
-      const { query, variables } = TodoListQuery(page, this.cntPerPage);
-      this.$axios
-        .post('http://localhost:4000/graphql', { query, variables })
-        .then(
-          ({
-            data: {
-              data: {
-                TodoList: {
-                  page: { totalPageSize },
-                  data,
-                },
-              },
-            },
-          }) => {
-            console.log(totalPageSize);
-            this.todos = data;
-            // sync spoed slot
-            this.$emit('update:total-page-size', totalPageSize);
-            //  this.totalPageSize = totalPageSize;
-          },
-        );
+  watch: {
+    page() {
+      this.listTodo(this.page, this.cntPerPage);
     },
-    todoView(item: TodoItemType) {
-      const { query, variables } = TodoFindByIdQuery(item);
-      this.$axios
-        .post('http://localhost:4000/graphql', { query, variables })
-        .then(
-          ({
-            data: {
-              data: {
-                TodoFindById: { data: todo },
-              },
-            },
-          }) => {
-            // sync spoed slot
-            this.targetTodo = todo;
+  },
+  created() {
+    this.listTodo(this.page, this.cntPerPage);
+  },
 
-            // 다이얼로그 함수 호출
-            this.$emit('show-view-dialog');
-            // this.showViewDialog();
-          },
-        );
+  methods: {
+    listTodo(page: number, cntPerPage: number) {
+      this.$api.todo.todoList(page, cntPerPage).then((data) => {
+        this.todos = data.data;
+        this.$emit('update:total-page-size', data.page.totalPageSize);
+      });
     },
-    todoRemove(item: TodoItemType) {
-      const { query, variables } = TodoDeleteQuery(item);
-      this.$axios
-        .post('http://localhost:4000/graphql', { query, variables })
-        .then(
-          ({
-            data: {
-              data: {
-                TodoDelete: { data },
-              },
-            },
-          }) => {
-            console.log(data);
-            this.todoList(this.page);
-          },
-        );
+    removeTodo(todo: TodoItemType) {
+      this.$api.todo.todoRemove(todo).then(() => {
+        this.listTodo(this.page, this.cntPerPage);
+      });
     },
-    todoUpdate(todo: TodoItemType) {
-      const { query, variables } = TodoUpdateQuery(todo);
-      this.$axios
-        .post('http://localhost:4000/graphql', { query, variables })
-        .then(() => {
-          // 다이얼로그 함수 호출
-          // this.cancel();
-          this.$emit('cancel');
-          this.todoList(this.page);
-        });
+    updateTodo(todo: TodoItemType) {
+      this.$api.todo
+        .todoUpdate(todo)
+        .then(() => this.listTodo(this.page, this.cntPerPage));
+    },
+    addTodo(todo: TodoItemType) {
+      this.$api.todo
+        .todoUpdate(todo)
+        .then(() => this.listTodo(this.page, this.cntPerPage));
     },
   },
 });

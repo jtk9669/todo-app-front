@@ -1,19 +1,37 @@
-// import Vue from 'vue'
-// import api from '~/api/index'
-// export default ({ app }, inject) => {
-//   inject('myPlugin', Vue.observable({...api}))
+// import { Plugin } from '@nuxt/types';
+
+// import { todoApis } from '@/api/todo/api';
+// import { TodoApiType } from '@/api/todo/types';
+
+// interface IApis {
+//   todo: TodoApiType;
 // }
 
-import { Plugin } from '@nuxt/types';
+// declare module 'vue/types/vue' {
+//   interface Vue {
+//     $api: IApis;
+//   }
+// }
 
-declare module '@nuxt/types' {
-  interface Context {
-    $api: Object;
-  }
-}
+// declare module '@nuxt/types' {
+//   interface NuxtAppOptions {
+//     $api: IApis;
+//   }
+// }
 
-const apiPlugin: Plugin = (context) => {
-  context.$api = Object;
-};
+// declare module 'vuex/types/index' {
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+//   interface Store<S> {
+//     $api: IApis;
+//   }
+// }
 
-export default apiPlugin;
+// const apiUtils: Plugin = (_context, inject) => {
+//   const apis = {
+//     todo: { ...todoApis },
+//   };
+
+//   inject('api', apis);
+// };
+
+// export default apiUtils;

@@ -1,14 +1,19 @@
+// import { $axios  } from '@/utils/api';
 import axios from 'axios';
 import {
   TodoListQuery,
   TodoFindByIdQuery,
   TodoDeleteQuery,
   TodoUpdateQuery,
+  TodoCreateQuery,
 } from './queries';
 import { TodoItemType } from './types';
 
-export default {
-  async todoList(page: number = 1, cntPerPage: number = 4) {
+export const todoApis = {
+  async todoList(
+    page: number = 1,
+    cntPerPage: number = 4,
+  ): Promise<TodoItemType[]> {
     const { query, variables } = TodoListQuery(page, cntPerPage);
     const {
       data: {
@@ -19,14 +24,25 @@ export default {
       variables,
     });
 
-    return TodoList;
+    return TodoList as TodoItemType[];
     // console.log(totalPageSize);
     // this.todos = data;
     // // sync spoed slot
     // this.$emit('update:total-page-size', totalPageSize);
     // //  this.totalPageSize = totalPageSize;
   },
-  async todoView(item: TodoItemType) {
+  async todoCreate(title: string, content: string) {
+    const { query, variables } = TodoCreateQuery({
+      _id: '',
+      title,
+      content,
+    });
+    await axios.post('http://localhost:4000/graphql', { query, variables });
+    // this.cancel();
+    //    // this.todoList(this.page);
+  },
+
+  async todoView(item: TodoItemType): Promise<TodoItemType> {
     const { query, variables } = TodoFindByIdQuery(item);
     const {
       data: {
@@ -34,8 +50,11 @@ export default {
           TodoFindById, // : { data: todo }
         },
       },
-    } = await axios.post('http://localhost:4000/graphql', { query, variables });
-    return TodoFindById; // { data: todo }
+    } = await axios.post('http://localhost:4000/graphql', {
+      query,
+      variables,
+    });
+    return TodoFindById as TodoItemType; // { data: todo }
     // // sync spoed slot
     // this.targetTodo = todo;
 
@@ -43,7 +62,7 @@ export default {
     // this.$emit('show-view-dialog');
     // // this.showViewDialog();
   },
-  async todoRemove(item: TodoItemType) {
+  async todoRemove(item: TodoItemType): Promise<void> {
     const { query, variables } = TodoDeleteQuery(item);
     const {
       data: {
@@ -51,11 +70,14 @@ export default {
           TodoDelete, // : { data }
         },
       },
-    } = await axios.post('http://localhost:4000/graphql', { query, variables });
-    return TodoDelete;
+    } = await axios.post('http://localhost:4000/graphql', {
+      query,
+      variables,
+    });
+    console.log(TodoDelete);
     // this.todoList(this.page);
   },
-  async todoUpdate(todo: TodoItemType) {
+  async todoUpdate(todo: TodoItemType): Promise<void> {
     const { query, variables } = TodoUpdateQuery(todo);
     await axios.post('http://localhost:4000/graphql', { query, variables });
 
