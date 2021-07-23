@@ -13,7 +13,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
 import { TodoItemType } from '~/api/todo/types';
 export default Vue.extend({
   props: {
@@ -48,10 +47,18 @@ export default Vue.extend({
   },
 
   methods: {
+    // ...mapMutations({
+    //   setTotalPageSize: 'pagenation/setTotalPageSize',
+    // }),
+
     listTodo(page: number, cntPerPage: number) {
       this.$api.todo.todoList(page, cntPerPage).then((data) => {
         this.todos = data.data;
-        this.$emit('update:total-page-size', data.page.totalPageSize);
+        this.$store.commit(
+          'pagenation/setTotalPageSize',
+          data.page.totalPageSize,
+        );
+        // this.$emit('update:total-page-size', data.page.totalPageSize);
       });
     },
     removeTodo(todo: TodoItemType) {
@@ -60,15 +67,19 @@ export default Vue.extend({
       });
     },
     updateTodo(todo: TodoItemType) {
+      console.log('updateTodo call!');
       this.$api.todo
         .todoUpdate(todo)
         .then(() => this.listTodo(this.page, this.cntPerPage));
     },
     addTodo(todo: TodoItemType) {
       this.$api.todo
-        .todoUpdate(todo)
+        .todoCreate(todo.title, todo.content)
         .then(() => this.listTodo(this.page, this.cntPerPage));
     },
   },
 });
 </script>
+
+function mapMutations(arg0: {}): any { throw new Error('Function not
+implemented.'); }

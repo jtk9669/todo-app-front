@@ -3,7 +3,7 @@
     <v-dialog
       max-width="600px"
       :value="isShowDialog"
-      @input="$emit('update:is-show-dialog', !isShowDialog)"
+      @input="$store.commit('setIsShowDialog', !isShowDialog)"
     >
       <v-card>
         <v-card-title>{{ type }}</v-card-title>
@@ -40,7 +40,8 @@ export default Vue.extend({
   },
   methods: {
     cancel() {
-      this.$emit('update:isShowDialog');
+      // this.$emit('update:isShowDialog');
+      this.$store.commit('dialog/cancelDialog');
     },
     save() {
       this.$emit('update-todo');

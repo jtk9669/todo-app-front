@@ -1,10 +1,12 @@
 <template>
   <v-container class="ma-10">
+    <p>getType:{{ getType }}</p>
+    <p>getPage: {{ getPage }}</p>
     <todo-container
-      :page="page"
-      :total-page-size.sync="totalPageSize"
-      :cnt-per-page="cntPerPage"
-      :todo-target="todoTarget"
+      :page="getPage"
+      :total-page-size="getTotalPageSize"
+      :cnt-per-page="getCntPerPage"
+      :todo-target="getTodoTarget"
     >
       <template #[`todo-presenter`]="scopedSlot">
         <todo-presenter
@@ -12,30 +14,50 @@
           @show-dialog="showDialog"
           @remove-todo="scopedSlot.removeTodo"
         />
+        <v-btn
+          @click="
+            showDialog({ targetTodo: {}, isShowDialog: true, type: '추가' })
+          "
+          >추가</v-btn
+        >
         <dialog-presenter
-          :is-show-dialog.sync="isShowDialog"
-          :type="type"
-          @update-todo="scopedSlot.updateTodo(todoTarget)"
-          @add-todo="scopedSlot.addTodo(todoTarget)"
+          :is-show-dialog="getIsShowDialog"
+          :type="getType"
+          @update-todo="scopedSlot.updateTodo(getTodoTarget)"
+          @add-todo="scopedSlot.addTodo(getTodoTarget)"
         >
           <template #[`field`]>
-            <v-text-field v-model="todoTarget._id" label="id" />
-            <v-text-field v-model="todoTarget.title" label="title" />
-            <v-text-field v-model="todoTarget.content" label="content" />
+            <v-text-field :value="getTodoTarget._id" label="id" />
+            <v-text-field
+              :value="getTodoTarget.title"
+              label="title"
+              @input="setTitle"
+            />
+            <v-text-field
+              :value="getTodoTarget.content"
+              label="content"
+              @input="setContent"
+            />
           </template>
         </dialog-presenter>
       </template>
     </todo-container>
-    <v-pagination v-model="page" :length="totalPageSize" />
+    <v-pagination
+      :value="getPage"
+      :length="getTotalPageSize"
+      @input="setPage"
+    />
+    {{ getCounter }} <v-btn @click="increment">클릭</v-btn><br />
+    {{ getPage }}
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapGetters, mapMutations } from 'vuex';
 import TodoContainer from '@/components/Todo/TodoContainer.vue';
 import TodoPresenter from '@/components/Todo/TodoPresenter.vue';
 import DialogPresenter from '../Dialog/DialogPresenter.vue';
-import { TodoItemType } from '~/api/todo/types';
 
 export default Vue.extend({
   components: {
@@ -44,27 +66,28 @@ export default Vue.extend({
     DialogPresenter,
   },
   data() {
-    return {
-      page: 1,
-      cntPerPage: 3,
-      totalPageSize: 1,
-      isShowDialog: false,
-      type: '조회',
-      disabled: false,
-      todoTarget: {
-        _id: '',
-        title: '',
-        content: '',
-      } as TodoItemType,
-    };
+    return {};
+  },
+  computed: {
+    ...mapGetters({
+      getCounter: 'getCounter',
+      getPage: 'pagenation/getPage',
+      getCntPerPage: 'pagenation/getCntPerPage',
+      getTotalPageSize: 'pagenation/getTotalPageSize',
+      getIsShowDialog: 'dialog/getIsShowDialog',
+      getType: 'dialog/getType',
+      getDisabled: 'dialog/getDisabled',
+      getTodoTarget: 'dialog/getTodoTarget',
+    }),
   },
   methods: {
-    showDialog(obj: any) {
-      // 다이얼로그 ON
-      this.todoTarget = obj.targetTodo;
-      this.isShowDialog = obj.isShowDialog;
-      this.type = obj.type;
-    },
+    ...mapMutations({
+      increment: 'increment',
+      setPage: 'pagenation/setPage',
+      showDialog: 'dialog/showDialog',
+      setTitle: 'dialog/setTitle',
+      setContent: 'dialog/setContent',
+    }),
   },
 });
 </script>

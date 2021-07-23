@@ -21,12 +21,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- <slot
-      name="todo-dialog"
-      :todo-target="todoTarget"
-      :is-show-dialog="isShowDialog"
-      :type="type"
-    ></slot> -->
   </div>
 </template>
 
@@ -44,14 +38,13 @@ export default Vue.extend({
 
   methods: {
     view(todo: TodoItemType) {
-      console.log('view : ' + todo);
-      console.log(todo);
       const obj = {
         targetTodo: todo,
         type: '조회',
         isShowDialog: true,
       };
-      this.$emit('show-dialog', obj);
+      this.$store.commit('dialog/showDialog', obj);
+      // this.$emit('show-dialog', obj);
     },
     update(todo: TodoItemType) {
       const obj = {
@@ -59,7 +52,8 @@ export default Vue.extend({
         type: '수정',
         isShowDialog: true,
       };
-      this.$emit('show-dialog', obj);
+      this.$store.commit('dialog/showDialog', obj);
+      // this.$emit('show-dialog', obj);
     },
     remove(todo: TodoItemType) {
       this.$emit('remove-todo', todo);
